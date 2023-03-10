@@ -1,0 +1,804 @@
+---
+title: "Assignment 1"
+author: "Blaz Oder"
+date: "2023-03-05 - 2023-03-10"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+This is the Assignment 1 for the Bioinformatics Analysis and Visualisation of Medical Genomics Data course. The structure follows the instructions provided by course organizers. 
+
+```{r message = FALSE}
+# All the packages needed for this assignment are loaded here.
+library(tidyverse)
+library(zoo)
+library(airway) 
+library(ggpubr)
+library(SummarizedExperiment)
+library(tidybiology)
+```
+
+## Task 1 - Literature
+
+[NOTE: This task is also the basis of the journal club task on day two of Week 2 (see schedule)]
+
+#### 1. Read the research article of the hands-on working group you are assigned to (see file “Student Groups.pdf” in the shared folder "General course material").
+
+> [Article](https://www.nature.com/articles/s41588-021-00911-1)
+
+#### 2. Answer the following questions:
+#### a. What is the medically relevant insight from the article?
+
+> The medically relevant insight from the article is the development of a high-resolution integrated cellular taxonomy of breast tumors that reveals new cell types and states, along with remarkable intratumor transcriptional heterogeneity within epithelial, immune, and mesenchymal lineages. The study provides new insights into the immune profiles and spatial architecture of tumor microenvironment (TME) of breast tumors, identifying two large clusters of immune cells, lipid-associated macrophages (LAMs: LAM1 and LAM2) and CXCL10-high macrophages, localized within invasive TME niches. The study showed that LAMs and CXCL10-high macrophages are a major source of immunosuppressive molecules (high expression of PD-L1 and PD-L2) and may thus have functional relevance in regulating antitumor immunity. The study also revealed 9 “ecotypes”, each with distinct cellular composition, that correlated with patient survival. This insight has implications for breast cancer classification and prognosis, as well as for developing more personalized and effective treatments for breast cancer patients in the future. 
+
+#### b. Which genomics technology/ technologies were used?
+
+> +	Single-cell RNA sequencing (scRNA-seq) 
+> +	Immunophenotyping by cellular indexing of transcriptomes and epitopes by sequencing (CITE-seq) 
+> + Spatial transcriptomics
+
+#### 3. Further related research questions
+#### a. List and explain at least three questions/ hypotheses you can think of that extend the analysis presented in the paper.
+
+> + How is splicing dysregulation implicated in breast cancer pathobiology? Aberrant alternative splicing is a known hallmark of cancer. Investigating splicing events at a single-cell level may uncover novel mechanisms underlying breast cancer development and progression. 
+>
+> + Can the cellular taxonomy of breast tumors be further refined by incorporating additional technologies, such as single-cell assay for transposase-accessible chromatin by sequencing (scATAC-seq) and single-cell bisulfite sequencing (scBS-seq)? 
+Assessing transcriptional regulation may provide a deeper understanding of the intratumor transcriptional heterogeneity or even identify rare cell types or states that are currently not characterized.
+>
+> + How does the cellular composition and TME organization of breast tumors change over time and in relation to disease progression and therapy? 
+The paper already implies that intratumoral heterogeneity for intrinsic subtype may predict innate resistance to therapy and early relapse after therapy. Exploring intratumor transcriptional heterogeneity at different disease stages may give further insight into the progression of breast cancer as well as reveal therapy-resistant cell subpopulations and mechanisms of therapy resistance. Information acquired from such analysis could potentially be used to guide treatment decisions.
+
+#### b. [Optional] Devise a computational analysis strategy for (some of) the listed questions under 3a.
+
+
+## Task 2 - Git repositories and R Markdown
+
+#### ○ Start a new project in a Gitlab, Github or Figshare repository. Check with your doctoral supervisor if you can start a project in the repository of your lab or if you have to start your own repository. All documentation of the Assignment 1 has to be provided in your Git/ Figshare repository as a (formatted) text document. All documentation of your hands-on work during Week 2 also has to be provided in your repository as R Markdown document(s).
+
+> [Repository](https://github.com/blazoder/KI-course-5633)
+
+
+## Task 3 - Introduction to R and online R course
+
+#### ○ Install the most recent version of the R software on your computer by following the instructions provided at the R software website. 
+
+#### ○ Install the most recent version of RStudio Desktop (Open Source version) on your computer.
+
+#### ○ Bioconductor is an add-on package for R providing tools for the analysis and comprehension of high-throughput genomic data. Install the most recent version of the Bioconductor package on your computer.
+
+#### ○ Tidyverse is a toolbox for streamlining data import, modeling, transformation, curation, and visualization. Tidyverse tools enable you to make your scripts more reader friendly and overall more neat and efficient: 
++ https://www.tidyverse.org/packages/
++ Tidyverse has a powerful visualization package called ggplot2 that we recommend using. With ggplot2, you have more control over your plot’s parameters than with the basic R plotting functions.
+
+#### ○ [Optional] Conduct the R online course available here:
++ Introduction to R (hands-on exercises, strongly encouraged): https://campus.datacamp.com/courses/free-introduction-to-r (the course is completely free, but asks after every completed level to sign up for a license, which can be circumvented by going back to the course list)
++ Alternative resources for R: https://www.datacamp.com/community/open-courses/r-for-the-intimidated
++ R also provides an internal learning package named Swirl. Swirl is interactive and gives feedback on your progress. https://swirlstats.com/
+[NOTE: Depending on your previous experiences with R, taking this R online course might take more or less time. Please make sure to understand the concepts behind the exercises.]
+
+#### ○ [Optional] You can consider using R notebooks for Assignment 1. It is up to your preferences.
+
+#### ○ Reference for R language:
++ https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf
+
+#### ○ [Optional] More information on R Markdown and the Markdown cheatsheet:
++ https://rmarkdown.rstudio.com
++ https://raw.githubusercontent.com/rstudio/cheatsheets/master/rmarkdown-2.0.pdf (opening the link will download the cheat sheet on your computer)
+
+> All the mandatory tasks completed. RStudio Server provided by SciLifeLab has been used for this assignment. 
+
+
+## Task 4 - R basic operations
+
+#### 1. What is the square root of 10?
+
+```{r}
+# Square root of 10.
+sqrt(10)
+```
+
+#### 2. What is the logarithm of 32 to the base 2?
+
+```{r}
+# Logarithm of 32 to the base 2.
+log(32,2)
+```
+
+#### 3. What is the sum of the numbers from 1 to 1000?
+
+```{r}
+# Sum of numbers from 1 to 1000.
+sum(1:1000)
+```
+
+#### 4. What is the sum of all even numbers from 2 to 1000?
+
+```{r}
+# Sum of all even numbers from 2 to 1000.
+sum(seq(2,1000, by=2))
+```
+
+#### 5. How many pairwise comparisons are there for 100 genes?
+
+```{r}
+# Pairwise comparisons of 100 genes. Calculated by n\*(n-1)/2.
+100*(100-1)/2
+```
+
+#### 6. How many ways to arrange 100 genes in triples?
+
+```{r}
+# Number of possible triples of 100 genes. Calculated by n!/(n-3)!.
+factorial(100)/factorial(97)
+```
+
+## Task 5 - Using R example datasets
+
+#### 1. Use the R internal CO2 dataset ("data(CO2)").
+
+```{r}
+# Load the "CO2" dataset.
+data("CO2")
+
+# Inspect the first 6 rows of the dataset.
+head(CO2)
+```
+
+#### 2. Describe briefly the content of the CO2 dataset using the help function.
+
+> The CO2 dataset is a data frame with 84 rows and 5 columns. It contains data from an experiment on the cold tolerance of the grass species Echinochloa crus-galli, where the CO2 uptake of six plants from Quebec and six plants from Mississippi was measured at several levels of ambient CO2 concentration. Half the plants of each type were chilled overnight before the experiment was conducted.
+
+#### 3. What is the average and median CO2 uptake of the plants from Quebec and Mississippi?
+
+```{r}
+# Mean of all the plants from Quebec and Mississippi.
+mean(CO2$uptake)
+```
+
+```{r}
+# Median of all the plants from Quebec and Mississippi.
+median(CO2$uptake)
+```
+
+```{r}
+# Filter the dataset for "Mississippi" entries.
+Mississippi <- subset(CO2, Type == "Mississippi")
+
+# Mean of all the plants from Mississippi.
+mean(Mississippi$uptake)
+```
+
+```{r}
+# Median of all the plants from Mississippi.
+median(Mississippi$uptake)
+```
+
+```{r}
+# Filter the dataset for "Quebec" entries.
+Quebec <- subset(CO2, Type == "Quebec")
+
+# Mean of all the plants from Quebec.
+mean(Quebec$uptake)
+```
+
+```{r}
+# Median of all the plants from Quebec.
+median(Quebec$uptake)
+```
+
+#### 4. [Optional] In the "airway" example data from Bioconductor, how many genes are expressed in each sample? How many genes are not expressed in any sample?
+
+```{r}
+# Load the "airway" dataset.
+data("airway")
+
+# Inspect the first 6 rows of the dataset.
+head(assay(airway))
+```
+
+```{r}
+# Number of expressed genes per sample.
+colSums(assay(airway) !=0)
+```
+
+```{r}
+# Number of genes not expressed in any sample.
+sum(rowSums(assay(airway) > 0) == 0)
+```
+
+## Task 6 - R Functions
+
+#### 1. Write a function that calculates the ratio of the mean and the median of a given vector. This is a helpful measure to detect data with outlying values.
+[Note: See Reference for R language: https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf]
+
+```{r}
+# Function that calculates the ratio of the mean and the median of a given vector.
+mean_median_ratio <- function(x) {
+     mean(x)/median(x)
+}
+```
+
+#### 2. Write a function that ignores the lowest and the highest value from a given vector and calculate the mean.
+
+```{r}
+# Function that calculates the mean of a given vector, but ignores the lowest and the highest value.
+mean_no_extremes <- function(x) {
+  # Sort the vector.
+     sorted <- sort(x) 
+     # Remove extremes.
+     no_extremes <- sorted[2:(length(sorted)-1)]
+     # Calculate the mean.
+     mean(no_extremes)
+ }
+```
+
+#### 3. Read about piping and write a short (max. 300 characters, no spaces) explanation of why, how, and when not to use pipes.
++ https://r4ds.had.co.nz/pipes.html#pipes
+
+> Pipes allow for a more streamlined and readable way of expressing a linear sequence of operations. The %\>% operator passes the data from one function to another without the need for nested function calls or temporary variables. Pipes should be used when the code is repetitive or complex, but not when it becomes too convoluted or difficult to maintain.
+
+#### 4. Familiarize yourself with the apply-family of functions (apply, lapply, sapply etc.) and write a short explanation (max. 300 characters, no spaces) of why they could be useful in your work.
++ http://uc-r.github.io/apply_family 
+
+> The apply-family of functions are useful for iterating over data structures and applying a function to each element. This can be especially helpful in tasks like data cleaning, data transformation, and data summarization, where repetitive operations need to be performed on large datasets. This saves time and reduces the amount of code needed.
+
+
+## Task 7 - Basic visualization with R
+
+#### 1. Compare the distributions of the body heights of the two species from the "magic_guys.csv" dataset graphically.
+
+#### a. Use the basic "hist" function as well as "ggplot" and "geom_histogram" functions from the ggplot2 package. Optimize the plots for example by trying several different "breaks". Note that ggplot2-based functions give you many more options for changing the visualization parameters, try some of them.
+
+```{r}
+# Load the "magic_guys" dataset.
+magic_guys <- read.csv("magic_guys.csv")
+
+# Inspect the first 6 rows of the dataset.
+head(magic_guys)
+```
+
+```{r}
+# Default histogram of the body heights.
+hist(magic_guys$length,
+     # Add a title.
+     main = "Distribution of body height",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency")
+```
+
+```{r}
+# Histogram of the body heights with adjusted breaks, x- and y-axis range.
+hist(magic_guys$length,
+     # Set breaks.
+     breaks = 30,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Add a title.
+     main = "Distribution of body height",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",)
+```
+
+```{r}
+# Histogram of the body heights with adjusted breaks, x- and y-axis range.
+hist(magic_guys$length,
+     # Set breaks.
+     breaks = 60,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Add a title.
+     main = "Distribution of body height",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",)
+```
+
+```{r}
+# Filter the dataset for “sith” entries.
+sith <- subset(magic_guys, magic_guys$species == "sith")
+
+# Histogram of the body heights of Sith with adjusted breaks, x- and y-axis range.
+hist(sith$length,
+     # Set breaks.
+     breaks = 10,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Add a title.
+     main = "Distribution of body height of Sith",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",)
+```
+
+```{r}
+# Filter the dataset for “jedi” entries.
+jedi <- subset(magic_guys, magic_guys$species == "jedi")
+
+# Histogram of the body heights of Jedi with adjusted breaks, x- and y-axis.
+hist(jedi$length,
+     # Set breaks.
+     breaks = 30,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Add a title.
+     main = "Distribution of body height of Jedi",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",)
+```
+
+```{r}
+# Multi-histogram of the body heights of Sith and Jedi with adjusted breaks, x- and y-axis, and distinct coloring per species.
+hist(sith$length,
+     # Set breaks.
+     breaks = 10,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Set a color.
+     col = "#FF000080",
+     # Add a title.
+     main = "Distribution of body height",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",)
+hist(jedi$length,
+     # Set breaks.
+     breaks = 30,
+     # Set x-axis range.
+     xlim = c(50,300),
+     # Set y-axis range.
+     ylim = c(0,15),
+     # Set a color.
+     col = "#0000FF80",
+     # Add a title.
+     main = "Distribution of body height",
+     # Label x-axis.
+     xlab = "Body height (cm)",
+     # Label y-axis.
+     ylab = "Frequency",
+     # Overlay the histogram on top of the previous one.
+     add = T)
+
+# Add a legend.
+legend("topright",
+       # Add a title.
+       title = "Species",
+       # Add names.
+       legend = c("Sith","Jedi"),
+       # Set colors.
+       col = c("#FF000080", "#0000FF80"),
+       # Set symbol.
+       pch = 15,
+       # Set size of the symbol.
+       pt.cex = 2)
+```
+
+```{r}
+# Multi-histogram of the body heights of Sith and Jedi with density plots and adjusted x- and y-axis, and distinct coloring per species.
+ggplot(magic_guys, aes(x = length, fill = species)) + 
+  # Histogram.
+     geom_histogram(aes(y=..density..),
+                    # Overlap the histograms.
+                    position = "identity",
+                    # Set opacity.
+                    alpha = .2) + 
+  # Density plot.
+     geom_density(alpha = .5) +
+  # Add a title and label x- and y-axis.
+     labs(title = "Distribution of body length",
+          x = "Body length (cm)",
+          y = "Density") + 
+  # Set labels and colors. 
+     scale_fill_manual(labels = c("Sith", "Jedi"),
+                       values = c("#FF000080", "#0000FF80")) +
+  # Add a title to the legend.
+     guides(fill = guide_legend(title = "Species")) + 
+  # Set theme.
+     theme_classic()
+```
+
+> The analysis demonstrates that the distribution of body length of Sith is platykurtic with high variability (covering a wide range of approximately 50-270 cm), whereas the distribution of body length of Jedi is somewhat normal/mesokurtic with less variability (covering a range of approximately 60-200 cm).
+
+#### b. Do the same comparison as in a. but with boxplots. If you want to use the ggplot2 package, use the functions "ggplot" and "geom_boxplot".
+
+```{r}
+# Boxplot of the body heights of Sith and Jedi with distinct coloring per species.
+boxplot(magic_guys$length ~ magic_guys$species,
+        # Set colors.
+        col = c("#0000FF80", "#FF000080"),
+        # Set names.
+        names = c("Jedi", "Sith"),
+        # Add a title.
+        main = "Distribution of body length",
+        # Label x-asis.
+        xlab = "Species",
+        # Label y-axis.
+        ylab = "Body length (cm)")
+
+# Overlay individual data points.
+stripchart(magic_guys$length ~ magic_guys$species,
+           # Set method.
+            method = "jitter",
+           # Set symbol for data points.
+            pch = 20,
+           # Set it to vertical.
+            vertical = TRUE,
+           # Add the stripchart over the boxplot.
+            add = TRUE)
+```
+
+```{r}
+# Boxplot of the body heights of Sith and Jedi with distinct coloring per species.
+ggplot(magic_guys, aes(x = species, y = length, fill = species)) + 
+  # Boxplot.
+     geom_boxplot() +
+  # Overlay individual data points.
+     geom_jitter(width = 0.1) +
+  # Add a title and label x- and y-axis.
+     labs(title = "Distribution of body length",
+          x = "Species", 
+          y = "Body length (cm)") +
+  # Set colors. 
+     scale_fill_manual(values = c("#0000FF80", "#FF000080")) +
+  # Set labels.
+     scale_x_discrete(labels = c("Jedi", "Sith")) +
+  # Set theme.
+     theme_classic() + 
+  # Remove the legend.
+     theme(legend.position = "none")
+```
+
+> Boxplots show that Jedi are generally taller than Sith with a mean body length of approximately 175 cm and 125 cm, respectively. Similar as in .a analysis, the boxplots demonstrate larger dispersion of body lenghts of Jedi than Sith.
+
+#### c.	Save the plots with the ‘png’, ‘pdf’, and ‘svg’ formats. In which situation would you use which file format?
+
+> To save the plots with the ‘png’, ‘pdf’, and ‘svg’ formats using R command line, some code has to be added before and after plot code. 
+
+```{r eval=FALSE}
+# Set up the file formats to save the plot. E.g.:
+png("plot_x.png")
+
+# Create a plot. E.g.:
+ggplot(magic_guys, aes(x = species, y = length, fill = species)) + 
+     geom_boxplot() +
+     geom_jitter(width = 0.1) +
+     scale_fill_manual(values = c("#0000FF80", "#FF000080")) +
+     labs(title = "Distribution of body length",
+          x = "Species", 
+          y = "Body length (cm)") +
+     scale_x_discrete(labels = c("Jedi", "Sith")) +
+     theme_classic() + 
+     theme(legend.position = "none")
+
+# Close the graphics device.
+dev.off() 
+```
+
+> The three file formats, png, pdf, and svg, have different use cases depending on the situation:
+>
+> -	png (Portable Network Graphics) – a raster graphics format that is ideal for web graphics, icons, and logos that have solid colors, sharp edges, and transparent backgrounds. These files are usually small in size and cannot be easily edited.
+>
+> -	pdf (Portable Document Format) – a vector graphics format that is ideal for preserving the fonts, graphics, and layout of documents. These files are usually relatively small in size and can be relatively easily edited.
+>
+> -	svg (Scalable Vector Graphics) – a vector graphics format that is ideal for icons, logos, graphs, and illustrations that need to be scalable and resolution-independent. These files are usually moderate-to-large in size and very easily edited.
+>
+> I would avoid using png format for the distribution of scientific plots and rather stick to svg format that can be easily scaled and further modified in post-processing using e.g., Adobe InDesign or Illustrator. However, png and pdf might come useful for other purposes, e.g., presentations, lab reports, emails etc. 
+
+#### 2. Load the gene expression data matrix from the "microarray_data.tab" dataset provided in the shared folder, it is a big tabular separated matrix.
+
+#### a. How big is the matrix in terms of rows and columns?
+
+```{r}
+# Load the "microarray_data" dataset.
+microarray_data <- read.delim("microarray_data.tab")
+
+# Inspect the first 6 rows of the dataset.
+head(microarray_data)
+```
+
+```{r}
+# Inspect the dimensions of the dataset.
+dim(microarray_data)
+```
+
+> The dataset has 553 rows and 1000 columns (genes).
+
+#### b. Count the missing values per gene and visualize this result.
+
+```{r}
+# Count NAs per gene.
+missing_values <- colSums(is.na(microarray_data))
+
+# Barplot of missing values per gene with adjusted coloring, space, and border.
+barplot(missing_values,
+        # Set a color.
+        col = "#FF000080",
+        # Set no spacing.
+        space = 0,
+        # Set no border.
+        border = NA, 
+        # Add a title.
+        main = "Missing values per gene",
+        # Label x-axis.
+        xlab = "Gene",
+        # Label y-axis.
+        ylab = "Count")
+```
+
+> The barplot shows the number of missing values per gene.
+
+```{r}
+# Percentage of missing values per gene.
+percentage_missing_values <- missing_values/nrow(microarray_data)*100
+
+# Percentage of included values per gene.
+percentage_values <- 100 - percentage_missing_values
+
+# Combine percentages into a matrix.
+percentage <- as.matrix(rbind(percentage_missing_values, percentage_values))
+
+# Barplot of missing values per gene with adjusted coloring, space, and border.
+barplot(percentage,
+        # Set colors.
+        col = c("#FF000080", "#AFE1AF"),
+        # Set no spacing.
+        space = 0,
+        # Set no border.
+        border = NA, 
+        # Add a title.
+        main = "Missing values per gene",
+        # Label x-axis.
+        xlab = "Gene",
+        # Label y-axis.
+        ylab = "Percentage")
+
+#Add a legend.
+legend("topright",
+       # Add names.
+       legend = c("Missing", "Included"),
+       # Set colors.
+       col = c("#FF000080", "#AFE1AF"),
+       # Set symbol.
+       pch = 15,
+       # Set size of the symbol.
+       pt.cex = 2)
+```
+
+> Altough the boxplot looks almost identical, it is more informative to plot the percentage of missing values in relation to the included values.
+
+#### c. Find the genes for which there are more than X% (X=10%, 20%, 50%) missing values.
+
+```{r}
+# Define the thresholds for missing values.
+thresholds <- c(10, 20, 50)
+
+# List the genes for which there are more than X% missing values. Calculate the total numbers of these genes. Operations are repeated by "for" loop. 
+for (threshold in thresholds) {
+  # Paste text.
+  cat(paste("Genes with more than", threshold, "% missing values:\n"))
+  # List genes with missing values.
+  missing_genes <- names(percentage_missing_values[percentage_missing_values > threshold])
+  # Set punctuation.
+  cat(paste(missing_genes, collapse = ", "))
+  # Count the number of genes.
+  num_missing_genes <- length(missing_genes)
+  # Paste text.
+  cat(paste("\nTotal number of missing genes:", num_missing_genes, "\n\n"))
+}
+```
+
+#### d. Replace the missing values by the average expression value for the particular gene. (Note: Imputing data has to be used with caution!)
+
+```{r}
+# Replace NAs with mean value per gene. 
+microarray_data_filled <- na.aggregate(microarray_data, FUN = mean)
+
+# Inspect the first 6 rows of the dataset.
+head(microarray_data_filled)
+```
+> Missing values are replaced by mean value per gene.
+
+#### 3. Visualize the data in the CO2 dataset in a way that gives you a deeper understanding of the data. What do you see?
+
+```{r}
+# Boxplot of CO2 uptake of Echinochloa crus-galli in Quebec and Mississippi upon exposure to cold. T-test results are displayed for statistical inference.   
+ggplot(CO2, aes(x = Type, y = uptake, fill = Treatment)) + 
+  # Boxplot.
+  geom_boxplot() + 
+   # Add a title and label x- and y-axis.
+  labs(title = "CO2 uptake of Echinochloa crus-galli in Quebec and Mississippi",
+       x = "City", 
+       y = "CO2 uptake") +
+  # Set labels and colors.
+  scale_fill_manual(labels = c("Ambient", "Chilled"), 
+                    values = c("#FF000080", "#0000FF80")) +
+  # Set theme.
+  theme_classic() + 
+  # Perform t-test and display p-values.
+  stat_compare_means(method = "t.test")
+```
+
+> The findings indicate that plants in Mississippi have lower CO2 uptake levels overall. When subjected to cold, plants in Quebec demonstrate better ability to maintain CO2 uptake levels, as there is no significant difference between ambient and chilled conditions (p = 0.23). In contrast, plants in Mississippi show a significant reduction in CO2 uptake under chilled conditions (p = 5.1e06).
+
+```{r}
+# Boxplot of CO2 uptake of Echinochloa crus-galli in Quebec in relation to different levels of ambient CO2 concentration.
+ggplot(Quebec, aes(x = factor(conc), y = uptake, fill = Treatment)) +
+  # Boxplot.
+  geom_boxplot() + 
+  # Add a title and label x- and y-axis.
+  labs(title = "CO2 uptake of Echinochloa crus-galli at different CO2 concentrations \n- Quebec",
+       x = "C02 concentration", 
+       y = "CO2 uptake") +
+  # Set labels and colors.
+  scale_fill_manual(labels = c("Ambient", "Chilled"), 
+                    values = c("#FF000080", "#0000FF80")) +
+ # Set theme.
+  theme_classic()
+```
+
+```{r}
+# Boxplot of CO2 uptake of Echinochloa crus-galli in Mississippi in relation to different levels of ambient CO2 concentration.
+ggplot(Mississippi, aes(x = factor(conc), y = uptake, fill = Treatment)) + 
+  # Boxplot.
+  geom_boxplot() + 
+  # Add a title and label x- and y-axis.
+  labs(title = "CO2 uptake of Echinochloa crus-galli at different CO2 concentrations \n- Mississippi",
+       x = "C02 concentration", 
+       y = "CO2 uptake") +
+  # Set labels and colors.
+  scale_fill_manual(labels = c("Ambient", "Chilled"), 
+                    values = c("#FF000080", "#0000FF80")) +
+ # Set theme.
+  theme_classic()
+```
+
+> The two boxplots that take into account exposure to different levels of ambient CO2 concentration show comparable findings to the previous boxplot. The results suggest that plants in Quebec have a greater ability to maintain CO2 uptake levels at any CO2 concentration, while plants in Mississippi exhibit a decrease in CO2 uptake.
+
+## Task 8
+
+#### 1. Install the Tidybiology package, which includes the data "chromosome" and "proteins".
+
+```{r}
+# The Tidybiology package has been loaded at the beginning of this notebook.
+# Load the "chromosome" dataset.
+data("chromosome")
+
+# Inspect the first 6 rows of the dataset.
+head(chromosome)
+```
+
+#### a. Extract summary statistics (mean, median and maximum) for the following variables from the "chromosome" data: variations, protein coding genes, and miRNAs. Utilize the tidyverse functions to make this as simply as possible.
+
+```{r}
+# Summary statistics (mean, median and maximum) by using base R.
+apply(chromosome[c("variations", "protein_codinggenes", "mi_rna")], 2, function(x) c(mean = mean(x), median = median(x), maximum = max(x)))
+
+# Summary statistics (mean, median and maximum) by using tidyverse.
+chromosome %>%
+  summarise(across(c(variations, protein_codinggenes, mi_rna),
+                   list(mean = mean, median = median, maximum = max),
+                   .names = "{.col}_{.fn}"))
+```
+
+#### b. How does the chromosome size distribute? Plot a graph that helps to visualize this by using ggplot2 package functions.
+
+```{r}
+# Barplot of chromosome size distribution based on "length_mm".
+ggplot(chromosome, aes(x= id, y = length_mm)) +
+  # Barplot.
+  geom_bar(stat = "identity") +
+  # Add a title and label x- and y-axis.
+  labs(title = "Distribution of chromosome size",
+          x = "Chromosome", 
+          y = "Length (mm)") +
+  # Set theme.
+  theme_classic()
+```
+
+```{r}
+# Barplot of chromosome size distribution based on "basepairs".
+ggplot(chromosome, aes(x= id, y = basepairs)) +
+  # Barplot.
+  geom_bar(stat = "identity") +
+  # Add a title and label x- and y-axis.
+  labs(title = "Distribution of chromosome size",
+          x = "Chromosome", 
+          y = "Base pairs") +
+  # Set theme.
+  theme_classic()
+```
+
+> The two barplots that display the distribution of chromosome size based on length in millimeters or base pairs appear to be identical. In genomics, base pairs are a fundamental unit, therefore all subsequent operations are conducted using base pairs.
+
+#### c. Does the number of protein coding genes or miRNAs correlate with the length of the chromosome? Make two separate plots to visualize these relationships.
+
+```{r}
+# Correlogram of the number of "protein_codinggenes" and "basepairs". Linear trend, confidence interval, Pearson correlation coefficient and p-value are added.
+ggplot(chromosome, aes(x = basepairs, y = protein_codinggenes)) + 
+  # Scatterplot.
+  geom_point() +
+  # Add a trend line with CI.
+  geom_smooth(method = lm , color = "#FF000080", fill = "#D3D3D3", se = TRUE) +
+  # Add a title and label x- and y-axis.
+  labs(title = "Correlation - Number of protein coding genes and chromosome size",
+          x = "Chromosome size (bp)", 
+          y = "Number of protein coding genes") +
+  # Set theme.
+  theme_classic() +
+  # Calculate correlation and display the results.
+  stat_cor(method = "pearson")
+```
+
+```{r}
+# Correlogram of the number of "mi_RNA" and "basepairs". Linear trend, confidence interval, Pearson correlation coefficient and p-value are added. 
+ggplot(chromosome, aes(x = basepairs, y = mi_rna)) + 
+  # Scatterplot.
+  geom_point() +
+  # Add a trend line with CI.
+  geom_smooth(method = lm , color = "#FF000080", fill = "#D3D3D3", se = TRUE) +
+  # Add a title and label x- and y-axis.
+  labs(title = "Correlation - Number of miRNAs and chromosome size",
+          x = "Chromosome size (bp)", 
+          y = "Number of miRNAs") +
+  # Set theme.
+  theme_classic() +
+  # Calculate correlation and display the results.
+  stat_cor(method = "pearson")
+```
+
+> The correlation between chromosome size and both the number of protein genes and miRNAs is evident. However, the postive correlation appears to be more robust for miRNAs (R = 0.74, p = 3.6e-05) compared to protein coding genes (R = 0.61, p = 0.0016).
+
+#### d. Calculate the same summary statistics for the "proteins" data variables length and mass. Create a meaningful visualization of the relationship between these two variables by utilizing the ggplot2 package functions. Play with the colors, theme- and other visualization parameters to create a plot that pleases you.
+
+```{r}
+# Load the "proteins" dataset.
+data("proteins")
+
+# Inspect the first 6 rows of the dataset.
+head(proteins)
+```
+
+```{r}
+# Summary statistics (mean, median and maximum). 
+apply(proteins[c("length", "mass")], 2, function(x) c(mean = mean(x), median = median(x), maximum = max(x)))
+```
+
+```{r}
+# Correlogram of the number of "length" and "mass". The titles of the plot and the axes as well as the coloring and the theme are adjusted. Linear trend, confidence interval, Pearson correlation coefficient and p-value are added. 
+ggplot(proteins, aes(x = length, y = mass)) + 
+  # Scatterplot.
+  geom_point() +
+  # Add a trend line with CI.
+  geom_smooth(method = lm , color = "#FF000080", fill = "#D3D3D3", se = TRUE) +
+  # Add a title and label x- and y-axis.
+  labs(title = "Correlation - length and mass of proteins",
+          x = "Length (aa)", 
+          y = "Mass (Da)") +
+  # Set theme.
+  theme_classic() +
+  # Calculate correlation and display the results.
+  stat_cor(method = "pearson")
+```
+
+> The correlation between length and mass of proteins is perfect positive (R = 1, p < 2.2e-16).
